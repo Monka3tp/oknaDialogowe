@@ -1,6 +1,6 @@
 import sys
 
-from PyQt6.QtWidgets import QDialog, QApplication, QInputDialog, QColorDialog, QFontDialog
+from PyQt6.QtWidgets import QDialog, QApplication, QInputDialog, QColorDialog, QFontDialog, QFileDialog
 from pycountry import countries
 
 from layout import Ui_Dialog
@@ -18,8 +18,22 @@ class MyFrom(QDialog):
         self.index_of_Poland = self.countries.index("Poland")
         self.ui.colorButton.clicked.connect(self.display_color)
         self.ui.fontButton.clicked.connect(self.display_font)
-
+        self.ui.saveButton.clicked.connect(self.save)
+        self.ui.readButton.clicked.connect(self.read)
         self.show()
+
+    def save(self):
+        path, _ = QFileDialog.getSaveFileName(self, 'Zapisz plik', '.') #podloga to smietnik
+        if not path.endswith('.txt'):
+            path += '.txt'
+        with open(path, 'w') as file:
+            file.write(self.ui.textEdit.toPlainText())
+
+    def read(self):
+        path, _ = QFileDialog.getOpenFileName(self, 'Wczytaj plik', '.', 'Text files (*.txt)')
+        with open(path, 'r') as file:
+            self.ui.textEdit.setPlainText(file.read())
+
     def display_font(self):
         font, ok = QFontDialog.getFont()
         if ok:
@@ -41,6 +55,7 @@ class MyFrom(QDialog):
             print(red, green, blue)
 
     def display_country(self):
+        #wybieranie z listy
         countryName, ok = QInputDialog.getItem(self, "Podaj państwa", "Państwo", self.countries, self.index_of_Poland, False)
         if ok:
             self.ui.countryEdit.setText(countryName)
